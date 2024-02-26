@@ -1,12 +1,27 @@
 import { describe, it, expect, beforeEach, jest } from '@jest/globals'
 import fs from 'fs/promises'
 import Service from '../src/service.js'
+import crypto from 'node:crypto'
 
 describe('# Service', () => {
   let _service
   const filename = 'test.ndjson'
+  const MOCKED_HASH_PASSWORD = 'hashed_password'
 
   beforeEach(() => {
+    jest.spyOn(
+      crypto,
+      crypto.createHash.name
+    ).mockReturnValue({
+      update: jest.fn().mockReturnThis(),
+      digest: jest.fn().mockReturnValue(MOCKED_HASH_PASSWORD)
+    })
+
+    jest.spyOn(
+      fs,
+      fs.writeFile.name
+    ).mockResolvedValue()
+
     _service = new Service({
       filename
     })
